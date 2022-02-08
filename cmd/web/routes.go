@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/amiranbari/Go-server/pkg/config"
-	"github.com/amiranbari/Go-server/pkg/handlers"
+	"github.com/amiranbari/bookings/pkg/config"
+	"github.com/amiranbari/bookings/pkg/handlers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )

@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/amiranbari/Go-server/pkg/config"
-	"github.com/amiranbari/Go-server/pkg/handlers"
-	"github.com/amiranbari/Go-server/pkg/renders"
+	"github.com/amiranbari/bookings/pkg/config"
+	"github.com/amiranbari/bookings/pkg/handlers"
+	"github.com/amiranbari/bookings/pkg/renders"
 
 	// "math/rand"
 	"net/http"
