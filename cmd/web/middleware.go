@@ -22,4 +22,4 @@ func NoSruve(next http.Handler) http.Handler {
 //laods and saves the session on every reqeust
 func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
-}
+} 
