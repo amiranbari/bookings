@@ -1,0 +1,24 @@
+{{template "base" .}}
+
+{{define "content"}}
+
+{{$res := index .Data "reservation"}}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>name</th>
+            <th>lastName</th>
+            <th>email</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td>{{$res.FirstName}}</td>
+            <td>{{$res.LastName}}</td>
+            <td>{{$res.Email}}</td>
+        </tr>
+    </tbody>
+</table>
+{{end}}

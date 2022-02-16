@@ -2,6 +2,7 @@ package main
 
 import (
 	// "errors"
+	"encoding/gob"
 	"fmt"
 	"log"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/amiranbari/bookings/pkg/config"
 	"github.com/amiranbari/bookings/pkg/handlers"
+	"github.com/amiranbari/bookings/pkg/models"
 	"github.com/amiranbari/bookings/pkg/renders"
 
 	// "math/rand"
@@ -52,6 +54,9 @@ var app config.AppConfig
 var session *scs.SessionManager
 
 func main() {
+	//Say what we need to put in out session
+	gob.Register(models.Reservation{})
+
 	// change this to true in production
 	app.InProduction = false
 
