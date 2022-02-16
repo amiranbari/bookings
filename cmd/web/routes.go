@@ -27,6 +27,8 @@ func route(app *config.AppConfig) http.Handler {
 	mux.Post("/", handlers.Repo.PostHome)
 	mux.Get("/json", handlers.Repo.Json)
 
+	mux.Get("/reservation", handlers.Repo.Reservation)
+
 	fileServer := http.FileServer(http.Dir("../../static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 

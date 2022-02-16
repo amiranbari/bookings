@@ -2,4 +2,52 @@
 
 {{define "content"}}
 <h1>Welcome to home page</h1>
+<form action="/" method="post">
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+    {{$res := index .Data "reservation"}}
+
+
+    <input type="text" name="firstname" {{with .Form.Errors.Get "firstname" }} class="is-invalid" {{end}}
+        value="{{$res.FirstName}}">
+    {{with .Form.Errors.Get "firstname" }}
+    {{.}}
+    {{end}}
+    <br><br>
+
+
+    <input type="text" name="lastname" {{with .Form.Errors.Get "lastname" }} class="is-invalid" {{end}}
+        value="{{$res.LastName}}">
+    {{with .Form.Errors.Get "lastname" }}
+    {{.}}
+    {{end}}
+    <br><br>
+
+    <input type="text" name="email" {{with .Form.Errors.Get "email" }} class="is-invalid" {{end}}
+        value="{{$res.Email}}">
+    {{with .Form.Errors.Get "email" }}
+    {{.}}
+    {{end}}
+    <br><br>
+    <button type="submit">post</button>
+</form>
+
+{{if ne (index .Error) ""}}
+<p>
+    {{index .Error}}
+</p>
+{{end}}
+
+{{if ne (index .Flash) ""}}
+<p>
+    {{index .Flash}}
+</p>
+{{end}}
+
+{{if ne (index .Warning) ""}}
+<p>
+    {{index .Warning}}
+</p>
+{{end}}
+
 {{end}}
