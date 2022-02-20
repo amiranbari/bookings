@@ -6,10 +6,10 @@ import (
 	"testing"
 )
 
-func TestNoSruve(t *testing.T) {
+func TestNoSurf(t *testing.T) {
 	var myH myHandler
 
-	h := NoSruve(&myH)
+	h := NoSurf(&myH)
 
 	switch v := h.(type) {
 	case http.Handler:
