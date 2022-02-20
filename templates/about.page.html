@@ -3,8 +3,6 @@
 {{define "content"}}
 <h1>Welcome to about page</h1>
 <h2>New line for about page</h2>
-<h2>This comes from the themplate: {{index .StringMap "test"}}</h2>
-<h2>This comes from the themplate: {{index .StringMap "test2"}}</h2>
 <p>
     {{if ne (index .StringMap "remote_ip") ""}}
     Your remote ip address is {{index .StringMap "remote_ip"}}

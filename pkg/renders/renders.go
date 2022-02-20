@@ -2,9 +2,9 @@ package renders
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 
@@ -29,16 +29,10 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 
 	td.CSRFToken = nosurf.Token(r)
 
-	if td.StringMap == nil {
-		td.StringMap = map[string]string{"test2": "ok-test2"}
-	} else {
-		td.StringMap["test2"] = "ok-test2"
-	}
-
 	return td
 }
 
-func RenderTemplate(rw http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
+func RenderTemplate(rw http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 
 	var tc config.TemplateCache
 
@@ -51,7 +45,7 @@ func RenderTemplate(rw http.ResponseWriter, r *http.Request, tmpl string, td *mo
 	t, ok := tc[tmpl]
 
 	if !ok {
-		log.Fatal("Could not get template to browser")
+		return errors.New("Could not get template from cache")
 	}
 
 	buf := new(bytes.Buffer)
@@ -64,7 +58,10 @@ func RenderTemplate(rw http.ResponseWriter, r *http.Request, tmpl string, td *mo
 
 	if err != nil {
 		fmt.Println("Error writing template to browser", err)
+		return nil
 	}
+
+	return nil
 }
 
 func CreateTemplateCache() (config.TemplateCache, error) {
