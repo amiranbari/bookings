@@ -32,17 +32,10 @@ func NewHandlers(r *Repository) {
 }
 
 func (m *Repository) Home(rw http.ResponseWriter, r *http.Request) {
-	remoteIp := r.RemoteAddr
-	m.App.Session.Put(r.Context(), "remote_ip", remoteIp)
-
 	var emptyReservation models.Reservation
 	data := make(map[string]interface{})
 	data["reservation"] = emptyReservation
-
-	renders.RenderTemplate(rw, r, "home.page.html", &models.TemplateData{
-		Form: forms.New(nil),
-		Data: data,
-	})
+	renders.RenderTemplate(rw, r, "home.page.html", &models.TemplateData{})
 }
 
 func (m *Repository) About(rw http.ResponseWriter, r *http.Request) {
@@ -64,9 +57,6 @@ func (m *Repository) PostHome(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-
-	// form.Required("firstname", "lastname")
-	// form.MinLength("firstname", 3, r)
 	form.Has("firstname")
 	form.Has("lastname")
 	form.IsEmail("email")
@@ -90,6 +80,7 @@ func (m *Repository) PostHome(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) Reservation(rw http.ResponseWriter, r *http.Request) {
+
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 
 	if !ok {
