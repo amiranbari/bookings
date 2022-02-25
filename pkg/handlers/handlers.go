@@ -2,7 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/amiranbari/bookings/internal/driver"
 	"github.com/amiranbari/bookings/internal/helpers"
+	"github.com/amiranbari/bookings/internal/repository"
+	"github.com/amiranbari/bookings/internal/repository/dbrepo"
+	"log"
 	"net/http"
 
 	"github.com/amiranbari/bookings/internal/forms"
@@ -17,12 +21,14 @@ var Repo *Repository
 // Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 //NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
@@ -32,10 +38,14 @@ func NewHandlers(r *Repository) {
 }
 
 func (m *Repository) Home(rw http.ResponseWriter, r *http.Request) {
+	log.Println(m.DB.AllUsers())
 	var emptyReservation models.Reservation
 	data := make(map[string]interface{})
 	data["reservation"] = emptyReservation
-	renders.RenderTemplate(rw, r, "home.page.html", &models.TemplateData{})
+	renders.RenderTemplate(rw, r, "home.page.html", &models.TemplateData{
+		Data: data,
+		Form: forms.New(nil),
+	})
 }
 
 func (m *Repository) About(rw http.ResponseWriter, r *http.Request) {
