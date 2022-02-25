@@ -4,6 +4,7 @@ import (
 	// "errors"
 	"encoding/gob"
 	"fmt"
+	"github.com/amiranbari/bookings/internal/driver"
 	"github.com/amiranbari/bookings/internal/helpers"
 	"log"
 	"os"
@@ -59,7 +60,12 @@ var errorLog *log.Logger
 
 func main() {
 
-	err := run()
+	db, err := run()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.SQL.Close()
 
 	// http.HandleFunc("/", handlers.Repo.Home)
 	// http.HandleFunc("/about", handlers.Repo.About)
@@ -80,7 +86,7 @@ func main() {
 	log.Fatal(err)
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 	//Say what we need to put in out session
 	gob.Register(models.Reservation{})
 
@@ -101,20 +107,29 @@ func run() error {
 
 	app.Session = session
 
+	//connect to database
+	log.Println("Connecting to database ...")
+	db, err := driver.ConnectSql("host=localhost port=5432 dbname=test user=postgres password=123456")
+	if err != nil {
+		log.Fatal("Cannot connect to database! Dying ...")
+	}
+
+	log.Println("Connected to database!")
+
 	tc, err := renders.CreateTemplateCache()
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return nil, err
 	}
 
 	app.TemplateCache = tc
 	app.UseCache = false
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 
 	renders.NewTemplates(&app)
 	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 }
