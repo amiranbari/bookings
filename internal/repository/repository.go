@@ -1,5 +1,7 @@
 package repository
 
+import "github.com/amiranbari/bookings/pkg/models"
+
 type DatabaseRepo interface {
-	AllUsers() bool
+	InsertReservation(res models.Reservation) error
 }

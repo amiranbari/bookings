@@ -6,8 +6,9 @@ import (
 	"github.com/amiranbari/bookings/internal/helpers"
 	"github.com/amiranbari/bookings/internal/repository"
 	"github.com/amiranbari/bookings/internal/repository/dbrepo"
-	"log"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/amiranbari/bookings/internal/forms"
 	"github.com/amiranbari/bookings/pkg/config"
@@ -38,18 +39,17 @@ func NewHandlers(r *Repository) {
 }
 
 func (m *Repository) Home(rw http.ResponseWriter, r *http.Request) {
-	log.Println(m.DB.AllUsers())
 	var emptyReservation models.Reservation
 	data := make(map[string]interface{})
 	data["reservation"] = emptyReservation
-	renders.RenderTemplate(rw, r, "home.page.html", &models.TemplateData{
+	renders.Template(rw, r, "home.page.html", &models.TemplateData{
 		Data: data,
 		Form: forms.New(nil),
 	})
 }
 
 func (m *Repository) About(rw http.ResponseWriter, r *http.Request) {
-	renders.RenderTemplate(rw, r, "about.page.html", &models.TemplateData{})
+	renders.Template(rw, r, "about.page.html", &models.TemplateData{})
 }
 
 func (m *Repository) PostHome(rw http.ResponseWriter, r *http.Request) {
@@ -60,10 +60,34 @@ func (m *Repository) PostHome(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
+
+	// 2020-01-01 -- 01/02 03:0405PM '06 --700
+	layout := "2006-01-02"
+	startDate, err := time.Parse(layout, sd)
+	if err != nil {
+		helpers.ServerError(rw, err)
+	}
+
+	endDate, err := time.Parse(layout, ed)
+	if err != nil {
+		helpers.ServerError(rw, err)
+	}
+
+	roomId, err := strconv.Atoi(r.Form.Get("room_id"))
+	if err != nil {
+		helpers.ServerError(rw, err)
+	}
+
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("firstname"),
 		LastName:  r.Form.Get("lastname"),
 		Email:     r.Form.Get("email"),
+		Phone:     r.Form.Get("phone"),
+		StartDate: startDate,
+		EndDate:   endDate,
+		RoomId:    roomId,
 	}
 
 	form := forms.New(r.PostForm)
@@ -75,7 +99,7 @@ func (m *Repository) PostHome(rw http.ResponseWriter, r *http.Request) {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
 
-		renders.RenderTemplate(rw, r, "home.page.html", &models.TemplateData{
+		renders.Template(rw, r, "home.page.html", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
@@ -83,7 +107,12 @@ func (m *Repository) PostHome(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// m.App.Session.Put(r.Context(), "reservation", reservation)
+	err = m.DB.InsertReservation(reservation)
+	if err != nil {
+		helpers.ServerError(rw, err)
+	}
+
+	m.App.Session.Put(r.Context(), "reservation", reservation)
 
 	http.Redirect(rw, r, "/reservation", http.StatusSeeOther)
 
@@ -104,7 +133,7 @@ func (m *Repository) Reservation(rw http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["reservation"] = reservation
 
-	renders.RenderTemplate(rw, r, "reservation.page.html", &models.TemplateData{
+	renders.Template(rw, r, "reservation.page.html", &models.TemplateData{
 		Data: data,
 	})
 }
