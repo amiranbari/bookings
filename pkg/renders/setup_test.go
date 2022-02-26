@@ -18,6 +18,10 @@ var testApp config.AppConfig
 func TestMain(m *testing.M) {
 	//Say what we need to put in out session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
+	gob.Register(models.RoomRestriction{})
 
 	// change this to true in production
 	testApp.InProduction = false

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/gob"
 	"fmt"
+	"github.com/amiranbari/bookings/internal/driver"
 	"html/template"
 	"log"
 	"net/http"
@@ -101,6 +102,11 @@ func getRoutes() http.Handler {
 
 	app.Session = session
 
+	db, err := driver.ConnectSql("host=localhost port=5432 dbname=test user=postgres password=123456")
+	if err != nil {
+		log.Fatal("Cannot connect to database! Dying ...")
+	}
+
 	tc, err := CreateTestTemplateCache()
 	if err != nil {
 		log.Fatal(err)
@@ -109,10 +115,10 @@ func getRoutes() http.Handler {
 	app.TemplateCache = tc
 	app.UseCache = true
 
-	repo := NewRepo(&app)
+	repo := NewRepo(&app, db)
 	NewHandlers(repo)
 
-	renders.NewTemplates(&app)
+	renders.NewRenderer(&app)
 
 	mux := chi.NewRouter()
 

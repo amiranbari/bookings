@@ -8,28 +8,84 @@
     {{$res := index .Data "reservation"}}
 
 
-    <input type="text" name="firstname" {{with .Form.Errors.Get "firstname" }} class="is-invalid" {{end}}
-        value="{{$res.FirstName}}">
-    {{with .Form.Errors.Get "firstname" }}
-    {{.}}
-    {{end}}
-    <br><br>
+   <div class="form-group">
+       <label for="firstname">
+           FirstName:
+       </label>
+       <input type="text" name="firstname" class="form-control {{with .Form.Errors.Get "firstname" }} is-invalid {{end}}"
+              value="{{$res.FirstName}}">
+       {{with .Form.Errors.Get "firstname" }}
+           {{.}}
+       {{end}}
+   </div>
+    <br>
 
 
-    <input type="text" name="lastname" {{with .Form.Errors.Get "lastname" }} class="is-invalid" {{end}}
-        value="{{$res.LastName}}">
-    {{with .Form.Errors.Get "lastname" }}
-    {{.}}
-    {{end}}
-    <br><br>
+    <div class="form-group">
+        <label for="firstname">
+            LastName:
+        </label>
+        <input type="text" name="lastname" class="form-control {{with .Form.Errors.Get "lastname" }} is-invalid {{end}}"
+               value="{{$res.LastName}}">
+        {{with .Form.Errors.Get "lastname" }}
+            {{.}}
+        {{end}}
+    </div>
+    <br>
 
-    <input type="text" name="email" {{with .Form.Errors.Get "email" }} class="is-invalid" {{end}}
-        value="{{$res.Email}}">
-    {{with .Form.Errors.Get "email" }}
-    {{.}}
-    {{end}}
-    <br><br>
-    <button type="submit">post</button>
+    <div class="form-group">
+        <label for="firstname">
+            Email:
+        </label>
+        <input type="email" name="email" class="form-control {{with .Form.Errors.Get "email" }} is-invalid {{end}}"
+               value="{{$res.Email}}">
+        {{with .Form.Errors.Get "email" }}
+            {{.}}
+        {{end}}
+    </div>
+    <br>
+
+    <div class="form-group">
+        <label for="firstname">
+            phone:
+        </label>
+        <input type="text" name="phone" class="form-control {{with .Form.Errors.Get "phone" }} is-invalid {{end}}"
+               value="{{$res.Phone}}">
+        {{with .Form.Errors.Get "phone" }}
+            {{.}}
+        {{end}}
+    </div>
+    <br>
+
+
+    <div class="form-group">
+        <label for="firstname">
+            StartDate:
+        </label>
+        <input type="text" name="start_date" class="form-control {{with .Form.Errors.Get "start_date" }} is-invalid {{end}}"
+               value="{{$res.StartDate}}">
+        {{with .Form.Errors.Get "start_date" }}
+            {{.}}
+        {{end}}
+    </div>
+    <br>
+
+    <div class="form-group">
+        <label for="firstname">
+            EndDate:
+        </label>
+        <input type="text" name="end_date" class="form-control {{with .Form.Errors.Get "end_date" }} is-invalid {{end}}"
+               value="{{$res.EndDate}}">
+        {{with .Form.Errors.Get "end_date" }}
+            {{.}}
+        {{end}}
+    </div>
+    <br>
+
+    <input type="text" name="room_id" value="1" hidden>
+
+
+    <button type="submit" class="btn btn-success">post</button>
 </form>
 
 {{if ne (index .Error) ""}}
