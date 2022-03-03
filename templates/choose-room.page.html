@@ -1,0 +1,13 @@
+{{template "base" .}}
+
+{{define "content"}}
+
+    <h1>Choose room</h1>
+
+        {{$rooms := index .Data "rooms"}}
+
+        {{range $rooms}}
+            {{.Title}}
+        {{end}}
+
+{{end}}

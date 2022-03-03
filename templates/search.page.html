@@ -1,0 +1,46 @@
+{{template "base" .}}
+
+{{define "content"}}
+<h1>Search</h1>
+<form action="" method="post">
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+    <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Start..." name="start_date">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="End..." name="end_date">
+                </div>
+            </div>
+    </div>
+
+    <br>
+
+    <button type="submit" class="btn btn-success">search</button>
+</form>
+
+<hr>
+
+{{if ne (index .Error) ""}}
+    <div class="alert alert-warning">
+        {{index .Error}}
+    </div>
+{{end}}
+
+{{if ne (index .Flash) ""}}
+<p>
+    {{index .Flash}}
+</p>
+{{end}}
+
+{{if ne (index .Warning) ""}}
+<p>
+    {{index .Warning}}
+</p>
+{{end}}
+
+{{end}}

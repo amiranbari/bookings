@@ -176,3 +176,76 @@ func (m *Repository) Json(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
 	rw.Write(out)
 }
+
+func (m *Repository) Search(rw http.ResponseWriter, r *http.Request) {
+	var emptyReservation models.Reservation
+	data := make(map[string]interface{})
+	data["reservation"] = emptyReservation
+	renders.Template(rw, r, "search.page.html", &models.TemplateData{
+		Data: data,
+		Form: forms.New(nil),
+	})
+}
+
+func (m *Repository) PostSearch(rw http.ResponseWriter, r *http.Request) {
+
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Has("start_date")
+	form.Has("end_date")
+
+	if !form.Valid() {
+		renders.Template(rw, r, "search.page.html", &models.TemplateData{})
+		return
+	}
+
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
+
+	// 2020-01-01 -- 01/02 03:0405PM '06 --700
+	layout := "2006-01-02"
+	startDate, err := time.Parse(layout, sd)
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	endDate, err := time.Parse(layout, ed)
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	rooms, err := m.DB.SearchAvailabilityForAllRooms(startDate, endDate)
+
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	if len(rooms) == 0 {
+		m.App.Session.Put(r.Context(), "error", "No available room!")
+		http.Redirect(rw, r, "/search", http.StatusSeeOther)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["rooms"] = rooms
+
+	res := models.Reservation{
+		StartDate: startDate,
+		EndDate:   endDate,
+	}
+
+	m.App.Session.Put(r.Context(), "reservation", res)
+
+	renders.Template(rw, r, "choose-room.page.html", &models.TemplateData{
+		Data: data,
+	})
+
+}
