@@ -23,10 +23,11 @@ var theTests = []struct {
 	{"about", "/about", "GET", []postData{}, http.StatusOK},
 	{"json", "/json", "GET", []postData{}, http.StatusOK},
 	{"reservation", "/reservation", "GET", []postData{}, http.StatusOK},
-	{"home-post", "/", "POST", []postData{
+	{"make-reservation", "/make-reservation", "POST", []postData{
 		{"firstname", "amir"},
 		{"lastname", "anbari"},
 		{"email", "amiranbari33@gmail.com"},
+		{"phone", "+989335716723"},
 	}, http.StatusOK},
 }
 

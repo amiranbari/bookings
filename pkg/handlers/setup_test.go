@@ -123,15 +123,20 @@ func getRoutes() http.Handler {
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
-	//mux.Use(NoSurf)
 	mux.Use(SessionLoad)
 
 	mux.Get("/", Repo.Home)
 	mux.Get("/about", Repo.About)
-	mux.Post("/", Repo.PostHome)
 	mux.Get("/json", Repo.Json)
 
 	mux.Get("/reservation", Repo.Reservation)
+
+	//search
+	mux.Get("/search", Repo.Search)
+	mux.Post("/search", Repo.PostSearch)
+	mux.Get("/choose-room/{id}", Repo.ChooseRoom)
+	mux.Get("/make-reservation", Repo.MakeReservation)
+	mux.Post("/make-reservation", Repo.PostReservation)
 
 	fileServer := http.FileServer(http.Dir("../../static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))

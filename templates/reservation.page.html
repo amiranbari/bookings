@@ -7,9 +7,13 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>name</th>
-            <th>lastName</th>
-            <th>email</th>
+            <th>Name</th>
+            <th>LastName</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Room</th>
+            <th>Arrival</th>
+            <th>Departure</th>
         </tr>
     </thead>
 
@@ -18,6 +22,10 @@
             <td>{{$res.FirstName}}</td>
             <td>{{$res.LastName}}</td>
             <td>{{$res.Email}}</td>
+            <td>{{$res.Phone}}</td>
+            <td>{{$res.Room.Title}}</td>
+            <td>{{index .StringMap "start_date"}}</td>
+            <td>{{index .StringMap "end_date"}}</td>
         </tr>
     </tbody>
 </table>
