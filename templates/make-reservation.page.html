@@ -1,6 +1,9 @@
 {{template "base" .}}
 
 {{define "content"}}
+
+    {{$res := index .Data "reservation"}}
+
 <h1>Make a reservation</h1>
 <hr>
     <h5>
@@ -11,12 +14,14 @@
         Departure: {{index .StringMap "end_date"}}
     </h5>
 
+    <h5>
+        Room: {{$res.Room.Title}}
+    </h5>
+
 <hr>
 
-<form action="/" method="post">
+<form action="" method="post">
     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-
-    {{$res := index .Data "reservation"}}
 
 
    <div class="form-group">
