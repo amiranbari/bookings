@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/amiranbari/bookings/internal/driver"
 	"github.com/amiranbari/bookings/internal/helpers"
 	"github.com/amiranbari/bookings/internal/repository"
 	"github.com/amiranbari/bookings/internal/repository/dbrepo"
+	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
 	"time"
@@ -248,4 +250,49 @@ func (m *Repository) PostSearch(rw http.ResponseWriter, r *http.Request) {
 		Data: data,
 	})
 
+}
+
+func (m *Repository) ChooseRoom(rw http.ResponseWriter, r *http.Request) {
+	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	res.RoomId = roomID
+	m.App.Session.Put(r.Context(), "reservation", res)
+
+	http.Redirect(rw, r, "/make-reservation", http.StatusSeeOther)
+}
+
+func (m *Repository) MakeReservation(rw http.ResponseWriter, r *http.Request) {
+	var emptyReservation models.Reservation
+	data := make(map[string]interface{})
+	data["reservation"] = emptyReservation
+
+	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		helpers.ServerError(rw, errors.New("Cannot get reservation from session"))
+		return
+	}
+
+	sd := res.StartDate.Format("2006-01-02")
+	ed := res.EndDate.Format("2006-01-02")
+
+	stringMap := make(map[string]string)
+
+	stringMap["start_date"] = sd
+	stringMap["end_date"] = ed
+
+	renders.Template(rw, r, "make-reservation.page.html", &models.TemplateData{
+		Data:      data,
+		Form:      forms.New(nil),
+		StringMap: stringMap,
+	})
 }
