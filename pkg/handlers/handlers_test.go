@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"context"
+	"github.com/amiranbari/bookings/pkg/models"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -23,12 +26,6 @@ var theTests = []struct {
 	{"about", "/about", "GET", []postData{}, http.StatusOK},
 	{"json", "/json", "GET", []postData{}, http.StatusOK},
 	{"reservation", "/reservation", "GET", []postData{}, http.StatusOK},
-	{"make-reservation", "/make-reservation", "POST", []postData{
-		{"firstname", "amir"},
-		{"lastname", "anbari"},
-		{"email", "amiranbari33@gmail.com"},
-		{"phone", "+989335716723"},
-	}, http.StatusOK},
 }
 
 func TestHandlers(t *testing.T) {
@@ -69,4 +66,36 @@ func TestHandlers(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestRepository_Reservation(t *testing.T) {
+	reservation := models.Reservation{
+		RoomId: 1,
+		Room: models.Room{
+			ID:    1,
+			Title: "General",
+		},
+	}
+
+	req, _ := http.NewRequest("GET", "/make-reservation", nil)
+	ctx := getCtx(req)
+	req = req.WithContext(ctx)
+
+	rr := httptest.NewRecorder()
+	session.Put(ctx, "reservation", reservation)
+
+	handler := http.HandlerFunc(Repo.MakeReservation)
+
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Errorf("Reservation Handler return wrong response code: got %d, wanted %d", rr.Code, http.StatusOK)
+	}
+}
+
+func getCtx(req *http.Request) context.Context {
+	ctx, err := session.Load(req.Context(), req.Header.Get("X-Session"))
+	if err != nil {
+		log.Println(err)
+	}
+	return ctx
 }
