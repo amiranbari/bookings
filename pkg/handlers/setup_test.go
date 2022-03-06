@@ -3,14 +3,6 @@ package handlers
 import (
 	"encoding/gob"
 	"fmt"
-	"github.com/amiranbari/bookings/internal/driver"
-	"html/template"
-	"log"
-	"net/http"
-	"os"
-	"path/filepath"
-	"time"
-
 	"github.com/alexedwards/scs/v2"
 	"github.com/amiranbari/bookings/pkg/config"
 	"github.com/amiranbari/bookings/pkg/models"
@@ -18,12 +10,60 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/nosurf"
+	"html/template"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
 )
 
 var app config.AppConfig
 var session *scs.SessionManager
 var pathToTemplates = "templates"
 var functions = template.FuncMap{}
+
+func TestMain(m *testing.M) {
+	//Say what we need to put in out session
+	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
+	gob.Register(models.RoomRestriction{})
+
+	// change this to true in production
+	app.InProduction = false
+
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
+	session = scs.New()
+	session.Lifetime = 24 * time.Hour
+	session.Cookie.Persist = true
+	session.Cookie.SameSite = http.SameSiteLaxMode
+	session.Cookie.Secure = app.InProduction
+
+	app.Session = session
+
+	tc, err := CreateTestTemplateCache()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	app.TemplateCache = tc
+	app.UseCache = true
+
+	repo := NewTestRepo(&app)
+	NewHandlers(repo)
+
+	renders.NewRenderer(&app)
+
+	os.Exit(m.Run())
+}
 
 func NoSurf(next http.Handler) http.Handler {
 	csrfHandler := nosurf.New(next)
@@ -38,7 +78,7 @@ func NoSurf(next http.Handler) http.Handler {
 	return csrfHandler
 }
 
-//laods and saves the session on every reqeust
+//Loads and saves the session on every request
 func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
 }
@@ -82,44 +122,6 @@ func CreateTestTemplateCache() (config.TemplateCache, error) {
 }
 
 func getRoutes() http.Handler {
-	//Say what we need to put in out session
-	gob.Register(models.Reservation{})
-
-	// change this to true in production
-	app.InProduction = false
-
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
-	app.InfoLog = infoLog
-
-	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-	app.ErrorLog = errorLog
-
-	session = scs.New()
-	session.Lifetime = 24 * time.Hour
-	session.Cookie.Persist = true
-	session.Cookie.SameSite = http.SameSiteLaxMode
-	session.Cookie.Secure = app.InProduction
-
-	app.Session = session
-
-	db, err := driver.ConnectSql("host=localhost port=5432 dbname=test user=postgres password=123456")
-	if err != nil {
-		log.Fatal("Cannot connect to database! Dying ...")
-	}
-
-	tc, err := CreateTestTemplateCache()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	app.TemplateCache = tc
-	app.UseCache = true
-
-	repo := NewRepo(&app, db)
-	NewHandlers(repo)
-
-	renders.NewRenderer(&app)
-
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
