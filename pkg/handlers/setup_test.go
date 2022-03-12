@@ -24,6 +24,14 @@ var session *scs.SessionManager
 var pathToTemplates = "templates"
 var functions = template.FuncMap{}
 
+func listenForMail() {
+	go func() {
+		for {
+			_ = <-app.MailChan
+		}
+	}()
+}
+
 func TestMain(m *testing.M) {
 	//Say what we need to put in out session
 	gob.Register(models.Reservation{})
@@ -48,6 +56,12 @@ func TestMain(m *testing.M) {
 	session.Cookie.Secure = app.InProduction
 
 	app.Session = session
+
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
+	defer close(app.MailChan)
+
+	listenForMail()
 
 	tc, err := CreateTestTemplateCache()
 	if err != nil {
