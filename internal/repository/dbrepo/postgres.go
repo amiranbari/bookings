@@ -2,7 +2,9 @@ package dbrepo
 
 import (
 	"context"
+	"errors"
 	"github.com/amiranbari/bookings/pkg/models"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -142,4 +144,46 @@ func (m *PostgresDBRepo) GetRoomById(id int) (models.Room, error) {
 	}
 
 	return room, nil
+}
+
+func (m *PostgresDBRepo) GetUserByID(id int) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var user models.User
+
+	query := `select * from users where id = $1`
+
+	row := m.DB.QueryRowContext(ctx, query, id)
+	err := row.Scan(&user.ID, user.FirstName, user.LastName, user.Email, user.Password, user.AccessLevel, user.CreatedAt, user.UpdatedAt)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (m *PostgresDBRepo) Authenticate(email, password string) (int, string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var id int
+	var hashedPassword string
+
+	row := m.DB.QueryRowContext(ctx, "select id, password from users where email = $1", email)
+	err := row.Scan(&id, &hashedPassword)
+	if err != nil {
+		return 0, "", err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return 0, "", errors.New("incorrect password")
+	} else if err != nil {
+		return 0, "", err
+	}
+
+	return id, hashedPassword, nil
+
 }

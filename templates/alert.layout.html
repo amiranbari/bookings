@@ -1,0 +1,21 @@
+{{define "alerts"}}
+
+    {{if ne (index .Error) ""}}
+        <div class="alert alert-danger" role="alert">
+            {{index .Error}}
+        </div>
+    {{end}}
+
+    {{if ne (index .Flash) ""}}
+        <div class="alert alert-success" role="alert">
+            {{index .Flash}}
+        </div>
+    {{end}}
+
+    {{if ne (index .Warning) ""}}
+        <div class="alert alert-warning" role="alert">
+            {{index .Warning}}
+        </div>
+    {{end}}
+
+{{end}}
