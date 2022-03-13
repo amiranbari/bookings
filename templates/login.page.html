@@ -1,0 +1,40 @@
+{{template "base" .}}
+
+{{define "content"}}
+<h1>Login</h1>
+<form action="" method="post">
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+   <div class="form-group">
+       <label for="firstname">
+           Email:
+       </label>
+       <input type="email" name="email" class="form-control {{with .Form.Errors.Get "email" }} is-invalid {{end}}" value="">
+       {{with .Form.Errors.Get "email" }}
+           {{.}}
+       {{end}}
+   </div>
+    <br>
+
+    <div class="form-group">
+        <label for="firstname">
+            Password:
+        </label>
+        <input type="password" name="password" class="form-control {{with .Form.Errors.Get "password" }} is-invalid {{end}}" value="">
+        {{with .Form.Errors.Get "password" }}
+            {{.}}
+        {{end}}
+    </div>
+    <br>
+
+    <input type="text" name="room_id" value="1" hidden>
+
+
+    <button type="submit" class="btn btn-success">post</button>
+</form>
+
+<hr>
+
+{{template "alerts" .}}
+
+{{end}}

@@ -25,22 +25,6 @@
 
 <hr>
 
-{{if ne (index .Error) ""}}
-    <div class="alert alert-warning">
-        {{index .Error}}
-    </div>
-{{end}}
-
-{{if ne (index .Flash) ""}}
-<p>
-    {{index .Flash}}
-</p>
-{{end}}
-
-{{if ne (index .Warning) ""}}
-<p>
-    {{index .Warning}}
-</p>
-{{end}}
+{{template "alerts" .}}
 
 {{end}}

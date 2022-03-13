@@ -79,22 +79,6 @@
     <button type="submit" class="btn btn-success">post</button>
 </form>
 
-{{if ne (index .Error) ""}}
-<p>
-    {{index .Error}}
-</p>
-{{end}}
-
-{{if ne (index .Flash) ""}}
-<p>
-    {{index .Flash}}
-</p>
-{{end}}
-
-{{if ne (index .Warning) ""}}
-<p>
-    {{index .Warning}}
-</p>
-{{end}}
+    {{template "alerts" .}}
 
 {{end}}

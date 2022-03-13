@@ -7,6 +7,7 @@ import (
 	"github.com/amiranbari/bookings/internal/helpers"
 	"github.com/amiranbari/bookings/internal/repository"
 	"github.com/amiranbari/bookings/internal/repository/dbrepo"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -337,4 +338,47 @@ func (m *Repository) PostReservation(rw http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(rw, r, "/reservation", http.StatusSeeOther)
 
+}
+
+// Login users
+func (m *Repository) Login(rw http.ResponseWriter, r *http.Request) {
+	renders.Template(rw, r, "login.page.html", &models.TemplateData{
+		Form: forms.New(nil),
+	})
+}
+
+// PostLogin users
+func (m *Repository) PostLogin(rw http.ResponseWriter, r *http.Request) {
+	_ = m.App.Session.RenewToken(r.Context())
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("email", "password")
+	form.IsEmail("email")
+	form.MinLength("password", 8)
+	if !form.Valid() {
+		renders.Template(rw, r, "login.page.html", &models.TemplateData{
+			Form: form,
+		})
+		return
+	}
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	id, _, err := m.DB.Authenticate(email, password)
+	if err != nil {
+		log.Println(err)
+		m.App.Session.Put(r.Context(), "error", "invalid login credentials")
+		http.Redirect(rw, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	m.App.Session.Put(r.Context(), "user_id", id)
+	m.App.Session.Put(r.Context(), "flash", "Logged in successfully")
+	http.Redirect(rw, r, "/", http.StatusSeeOther)
 }
