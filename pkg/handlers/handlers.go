@@ -382,3 +382,18 @@ func (m *Repository) PostLogin(rw http.ResponseWriter, r *http.Request) {
 	m.App.Session.Put(r.Context(), "flash", "Logged in successfully")
 	http.Redirect(rw, r, "/", http.StatusSeeOther)
 }
+
+// Logout users
+func (m *Repository) Logout(rw http.ResponseWriter, r *http.Request) {
+	_ = m.App.Session.Destroy(r.Context())
+	_ = m.App.Session.RenewToken(r.Context())
+
+	http.Redirect(rw, r, "/", http.StatusSeeOther)
+}
+
+// Dashboard admin
+func (m *Repository) Dashboard(rw http.ResponseWriter, r *http.Request) {
+	renders.Template(rw, r, "dashboard.page.html", &models.TemplateData{
+		Form: forms.New(nil),
+	})
+}
