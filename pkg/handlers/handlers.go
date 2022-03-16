@@ -397,3 +397,17 @@ func (m *Repository) Dashboard(rw http.ResponseWriter, r *http.Request) {
 		Form: forms.New(nil),
 	})
 }
+
+func (m *Repository) AdminReservations(rw http.ResponseWriter, r *http.Request) {
+	data := make(map[string]interface{})
+	reservations, err := m.DB.AllReservations()
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+	data["reservations"] = reservations
+	renders.Template(rw, r, "admin-reservations.page.html", &models.TemplateData{
+		Form: forms.New(nil),
+		Data: data,
+	})
+}
