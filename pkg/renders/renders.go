@@ -7,13 +7,20 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/amiranbari/bookings/pkg/config"
 	"github.com/amiranbari/bookings/pkg/models"
 	"github.com/justinas/nosurf"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate": HumanDate,
+}
+
+func HumanDate(t time.Time) string {
+	return t.Format("2006-02-01")
+}
 
 var app *config.AppConfig
 

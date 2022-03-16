@@ -45,6 +45,7 @@ func route(app *config.AppConfig) http.Handler {
 		mux.Use(Auth)
 
 		mux.Get("/dashboard", handlers.Repo.Dashboard)
+		mux.Get("/reservations", handlers.Repo.AdminReservations)
 	})
 
 	fileServer := http.FileServer(http.Dir("../../static/"))

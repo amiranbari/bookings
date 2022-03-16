@@ -1,0 +1,59 @@
+{{template "admin-base" .}}
+
+{{define "content"}}
+    {{$res := index .Data "reservations"}}
+    <div class="row">
+        <div class="col-md-12 col-lg-12 col-sm-12">
+            <div class="white-box">
+                <div class="d-md-flex mb-3">
+                    <h3 class="box-title mb-0">Recent reservations</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table no-wrap" id="reservationTable">
+                        <thead>
+                        <tr>
+                            <th class="border-top-0">#</th>
+                            <th class="border-top-0">FirstName</th>
+                            <th class="border-top-0">LastName</th>
+                            <th class="border-top-0">Email</th>
+                            <th class="border-top-0">Phone</th>
+                            <th class="border-top-0">StartDate</th>
+                            <th class="border-top-0">EndDate</th>
+                            <th class="border-top-0">RoomTitle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {{range $res}}
+                                <tr>
+                                    <td>{{.ID}}</td>
+                                    <td>{{.FirstName}}</td>
+                                    <td>{{.LastName}}</td>
+                                    <td>{{.Email}}</td>
+                                    <td>{{.Phone}}</td>
+                                    <td>{{humanDate .StartDate}}</td>
+                                    <td>{{humanDate .EndDate}}</td>
+                                    <td>{{.Room.Title}}</td>
+                                </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
+
+{{define "page-title"}}
+    Reservations
+{{end}}
+
+{{define "js"}}
+    <script>
+        $(document).ready(function() {
+            const dataTable = new simpleDatatables.DataTable("#reservationTable", {
+                searchable: true,
+                fixedHeight: true,
+            });
+        });
+    </script>
+{{end}}
