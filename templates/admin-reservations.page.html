@@ -20,12 +20,17 @@
                             <th class="border-top-0">StartDate</th>
                             <th class="border-top-0">EndDate</th>
                             <th class="border-top-0">RoomTitle</th>
+                            <th class="border-top-0">Status</th>
                         </tr>
                         </thead>
                         <tbody>
                             {{range $res}}
                                 <tr>
-                                    <td>{{.ID}}</td>
+                                    <td>
+                                        <a href="admin/reservations/{{.ID}}">
+                                            {{.ID}}
+                                        </a>
+                                    </td>
                                     <td>{{.FirstName}}</td>
                                     <td>{{.LastName}}</td>
                                     <td>{{.Email}}</td>
@@ -33,6 +38,13 @@
                                     <td>{{humanDate .StartDate}}</td>
                                     <td>{{humanDate .EndDate}}</td>
                                     <td>{{.Room.Title}}</td>
+                                    <td>
+                                        {{if eq (.Processed) 1}}
+                                            <button class="btn btn-success text-white btn-sm">Processed!</button>
+                                            {{else}}
+                                            <button class="btn btn-danger text-white btn-sm">No!</button>
+                                        {{end}}
+                                    </td>
                                 </tr>
                             {{end}}
                         </tbody>

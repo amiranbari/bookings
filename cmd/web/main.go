@@ -73,6 +73,15 @@ func main() {
 
 	fmt.Println(fmt.Sprintf("starting application on port number %s", portNumber))
 
+	msg := models.MailData{
+		To:      "amiranbari@33gmail.com",
+		From:    "me@here.com",
+		Subject: "Reservation confirmation",
+		Content: "html",
+	}
+
+	app.MailChan <- msg
+
 	srv := &http.Server{
 		Addr:    portNumber,
 		Handler: route(&app),
