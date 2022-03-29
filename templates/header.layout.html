@@ -11,9 +11,11 @@
             </button>
             <div class="collapse navbar-collapse" id="mynavbar">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)">Link</a>
-                    </li>
+                    {{if eq (index .IsAuthenticated) true}}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                        </li>
+                    {{end}}
                     <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)">Link</a>
                     </li>

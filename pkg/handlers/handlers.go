@@ -411,3 +411,35 @@ func (m *Repository) AdminReservations(rw http.ResponseWriter, r *http.Request) 
 		Data: data,
 	})
 }
+
+func (m *Repository) AdminNewReservations(rw http.ResponseWriter, r *http.Request) {
+	data := make(map[string]interface{})
+	reservations, err := m.DB.AllNewReservations()
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+	data["reservations"] = reservations
+	renders.Template(rw, r, "admin-reservations.page.html", &models.TemplateData{
+		Form: forms.New(nil),
+		Data: data,
+	})
+}
+
+func (m *Repository) AdminShowReservations(rw http.ResponseWriter, r *http.Request) {
+	//data := make(map[string]interface{})
+
+	exploded := strings.Split(r.RequestURI, "/")
+	fmt.Println(exploded)
+	//roomID, err := strconv.Atoi(exploded[2])
+	//if err != nil {
+	//	m.App.Session.Put(r.Context(), "error", "missing url parameter")
+	//	http.Redirect(rw, r, "/search", http.StatusTemporaryRedirect)
+	//	return
+	//}
+	//
+	//renders.Template(rw, r, "admin-show-reservation.page.html", &models.TemplateData{
+	//	Form: forms.New(nil),
+	//	Data: data,
+	//})
+}
