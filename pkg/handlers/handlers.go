@@ -427,19 +427,77 @@ func (m *Repository) AdminNewReservations(rw http.ResponseWriter, r *http.Reques
 }
 
 func (m *Repository) AdminShowReservations(rw http.ResponseWriter, r *http.Request) {
-	//data := make(map[string]interface{})
+	data := make(map[string]interface{})
+
+	data["referer"] = r.Referer()
 
 	exploded := strings.Split(r.RequestURI, "/")
-	fmt.Println(exploded)
-	//roomID, err := strconv.Atoi(exploded[2])
-	//if err != nil {
-	//	m.App.Session.Put(r.Context(), "error", "missing url parameter")
-	//	http.Redirect(rw, r, "/search", http.StatusTemporaryRedirect)
-	//	return
-	//}
-	//
-	//renders.Template(rw, r, "admin-show-reservation.page.html", &models.TemplateData{
-	//	Form: forms.New(nil),
-	//	Data: data,
-	//})
+	id, err := strconv.Atoi(exploded[3])
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	res, err := m.DB.GetReservationByID(id)
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	data["reservation"] = res
+
+	renders.Template(rw, r, "admin-show-reservation.page.html", &models.TemplateData{
+		Form: forms.New(nil),
+		Data: data,
+	})
+}
+
+func (m *Repository) AdminPostShowReservations(rw http.ResponseWriter, r *http.Request) {
+
+	exploded := strings.Split(r.RequestURI, "/")
+	id, err := strconv.Atoi(exploded[3])
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	res, err := m.DB.GetReservationByID(id)
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	res.FirstName = r.Form.Get("firstname")
+	res.LastName = r.Form.Get("lastname")
+	res.Email = r.Form.Get("email")
+	res.Phone = r.Form.Get("phone")
+
+	err = m.DB.UpdateReservation(res)
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	m.App.Session.Put(r.Context(), "flash", "Reservation successfully updated.")
+	http.Redirect(rw, r, "/admin/reservations", http.StatusSeeOther)
+
+}
+
+func (m *Repository) AdminPutShowReservations(rw http.ResponseWriter, r *http.Request) {
+
+	exploded := strings.Split(r.RequestURI, "/")
+	id, err := strconv.Atoi(exploded[3])
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	err = m.DB.UpdateProcessedForReservation(id, 1)
+	if err != nil {
+		helpers.ServerError(rw, err)
+		return
+	}
+
+	m.App.Session.Put(r.Context(), "flash", "Reservation successfully processed.")
+	http.Redirect(rw, r, "/admin/reservations", http.StatusSeeOther)
 }
