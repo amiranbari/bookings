@@ -27,7 +27,7 @@
                             {{range $res}}
                                 <tr>
                                     <td>
-                                        <a href="admin/reservations/{{.ID}}">
+                                        <a href="/admin/reservations/{{.ID}}">
                                             {{.ID}}
                                         </a>
                                     </td>
@@ -39,11 +39,15 @@
                                     <td>{{humanDate .EndDate}}</td>
                                     <td>{{.Room.Title}}</td>
                                     <td>
-                                        {{if eq (.Processed) 1}}
-                                            <button class="btn btn-success text-white btn-sm">Processed!</button>
+
+                                            {{if eq (.Processed) 1}}
+                                                <button class="btn btn-success text-white btn-sm disabled">Processed!</button>
                                             {{else}}
-                                            <button class="btn btn-danger text-white btn-sm">No!</button>
-                                        {{end}}
+                                                <a href="/admin/reservations/{{.ID}}/processed">
+                                                    <button class="btn btn-danger text-white btn-sm" type="submit">No!</button>
+                                                </a>
+                                            {{end}}
+                                        
                                     </td>
                                 </tr>
                             {{end}}

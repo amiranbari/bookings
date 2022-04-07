@@ -181,6 +181,10 @@
             <!-- Container fluid  -->
             <!-- ============================================================== -->
             <div class="container-fluid">
+                {{if ne (index .Flash) ""}}
+                    <div class="alert alert-info text-center" role="alert">{{index .Flash}}</div>
+                {{end}}
+
                 {{block "content" .}}
                 {{end}}
             </div>

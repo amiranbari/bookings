@@ -1,10 +1,95 @@
 {{template "admin-base" .}}
 
 {{define "content"}}
-    here
+    {{$res := index .Data "reservation"}}
+
+    <h1>Make a reservation</h1>
+    <hr>
+    <h5>
+        Arrival: {{humanDate $res.StartDate}}
+    </h5>
+
+    <h5>
+        Departure: {{humanDate $res.EndDate}}
+    </h5>
+
+    <h5>
+        Room: {{$res.Room.Title}}
+    </h5>
+
+    <hr>
+
+    <form action="" method="post">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+
+        <div class="form-group">
+            <label for="firstname">
+                FirstName:
+            </label>
+            <input type="text" name="firstname" class="form-control {{with .Form.Errors.Get "firstname" }} is-invalid {{end}}"
+                   value="{{$res.FirstName}}">
+            {{with .Form.Errors.Get "firstname" }}
+                {{.}}
+            {{end}}
+        </div>
+        <br>
+
+
+        <div class="form-group">
+            <label for="firstname">
+                LastName:
+            </label>
+            <input type="text" name="lastname" class="form-control {{with .Form.Errors.Get "lastname" }} is-invalid {{end}}"
+                   value="{{$res.LastName}}">
+            {{with .Form.Errors.Get "lastname" }}
+                {{.}}
+            {{end}}
+        </div>
+        <br>
+
+        <div class="form-group">
+            <label for="firstname">
+                Email:
+            </label>
+            <input type="email" name="email" class="form-control {{with .Form.Errors.Get "email" }} is-invalid {{end}}"
+                   value="{{$res.Email}}">
+            {{with .Form.Errors.Get "email" }}
+                {{.}}
+            {{end}}
+        </div>
+        <br>
+
+        <div class="form-group">
+            <label for="firstname">
+                phone:
+            </label>
+            <input type="text" name="phone" class="form-control {{with .Form.Errors.Get "phone" }} is-invalid {{end}}"
+                   value="{{$res.Phone}}">
+            {{with .Form.Errors.Get "phone" }}
+                {{.}}
+            {{end}}
+        </div>
+        <br>
+
+        <input type="text" name="room_id" value="1" hidden>
+
+
+        <button type="submit" class="btn btn-success text-white">Edit</button>
+
+        <a href="{{index .Data "referer"}}">
+            <button type="button" class="btn btn-primary text-white">Cancel</button>
+        </a>
+
+        {{if eq $res.Processed 0}}
+            <a href="/admin/reservations/{{$res.ID}}/processed">
+                <button type="button" class="btn btn-info text-white">Mark as Processed</button>
+            </a>
+        {{end}}
+    </form>
 {{end}}
 
 {{define "page-title"}}
-{{/*    {{$res := index .Data "reservation"}}*/}}
-    Reservation 14 Details
+    {{$res := index .Data "reservation"}}
+    Reservation {{$res.ID}} Details
 {{end}}
