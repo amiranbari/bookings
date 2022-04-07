@@ -86,6 +86,10 @@
                 <button type="button" class="btn btn-info text-white">Mark as Processed</button>
             </a>
         {{end}}
+
+        <a href="/admin/reservations/{{$res.ID}}/delete" class="float-right">
+            <button type="button" class="btn btn-danger text-white">Delete</button>
+        </a>
     </form>
 {{end}}
 

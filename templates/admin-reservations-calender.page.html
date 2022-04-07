@@ -1,0 +1,64 @@
+{{template "admin-base" .}}
+
+{{define "content"}}
+    {{$now := index .Data "now"}}
+    {{$rooms := index .Data "rooms"}}
+    {{$dim := index .IntMap "days_in_month"}}
+    {{$currentMonth := index .StringMap "this_month"}}
+    {{$currentYear := index .IntMap "this_month_year"}}
+    <div class="col-md-12">
+        <div class="text-center">
+            <h3>{{formatDate $now "January"}} - {{formatDate $now "2006"}}</h3>
+        </div>
+
+        <div class="float-left">
+            <a href="/admin/reservations-calender?y={{index .StringMap "last_month_year"}}&m={{index .StringMap "last_month"}}" class="btn btn-sm btn-outline-secondary">
+                &lt;&lt;
+            </a>
+        </div>
+
+        <div class="float-right">
+            <a href="/admin/reservations-calender?y={{index .StringMap "next_month_year"}}&m={{index .StringMap "next_month"}}" class="btn btn-sm btn-outline-secondary">
+                &gt;&gt;
+            </a>
+        </div>
+
+        <div class="clearfix"></div>
+
+        {{range $rooms}}
+            {{$roomID := .ID}}
+
+            <h4>
+                {{.Title}}
+            </h4>
+
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <tr class="table-dark">
+                        {{range $index := iterate $dim}}
+                            <td class="text-center text-white">
+                                {{$index}}
+                            </td>
+                        {{end}}
+                    </tr>
+
+                    <tr>
+                        {{range $index := iterate $dim}}
+                            <td class="text-center text-white">
+                                <input type="checkbox">
+                            </td>
+                        {{end}}
+                    </tr>
+                </table>
+            </div>
+
+        {{end}}
+
+
+    </div>
+{{end}}
+
+{{define "page-title"}}
+    Reservation Calender
+{{end}}
