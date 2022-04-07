@@ -42,13 +42,15 @@ func route(app *config.AppConfig) http.Handler {
 
 	//admin dashboard
 	mux.Route("/admin", func(mux chi.Router) {
-		mux.Use(Auth)
+		//mux.Use(Auth)
 		mux.Get("/dashboard", handlers.Repo.Dashboard)
 		mux.Get("/reservations", handlers.Repo.AdminReservations)
 		mux.Get("/new-reservations", handlers.Repo.AdminNewReservations)
 		mux.Get("/reservations/{id}", handlers.Repo.AdminShowReservations)
 		mux.Post("/reservations/{id}", handlers.Repo.AdminPostShowReservations)
 		mux.Get("/reservations/{id}/processed", handlers.Repo.AdminPutShowReservations)
+		mux.Get("/reservations/{id}/delete", handlers.Repo.AdminDeleteReservation)
+		mux.Get("/reservations-calender", handlers.Repo.AdminReservationsCalender)
 	})
 
 	fileServer := http.FileServer(http.Dir("../../static/"))
