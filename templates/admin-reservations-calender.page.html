@@ -5,7 +5,8 @@
     {{$rooms := index .Data "rooms"}}
     {{$dim := index .IntMap "days_in_month"}}
     {{$currentMonth := index .StringMap "this_month"}}
-    {{$currentYear := index .IntMap "this_month_year"}}
+    {{$currentYear := index .StringMap "this_month_year"}}
+
     <div class="col-md-12">
         <div class="text-center">
             <h3>{{formatDate $now "January"}} - {{formatDate $now "2006"}}</h3>
@@ -25,35 +26,62 @@
 
         <div class="clearfix"></div>
 
-        {{range $rooms}}
-            {{$roomID := .ID}}
+        <form action="/admin/reservations-calender" method="post">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+            <input type="hidden" name="y" value="{{$currentYear}}">
+            <input type="hidden" name="m" value="{{$currentMonth}}">
+            {{range $rooms}}
+                {{$roomID := .ID}}
+                {{$blocks := index $.Data (printf "block_map_%d" .ID)}}
+                {{$reservations := index $.Data (printf "reservation_map_%d" .ID)}}
 
-            <h4>
-                {{.Title}}
-            </h4>
+                <h4>
+                    {{.Title}}
+                </h4>
 
 
-            <div class="table-responsive">
-                <table class="table table-bordered table-sm">
-                    <tr class="table-dark">
-                        {{range $index := iterate $dim}}
-                            <td class="text-center text-white">
-                                {{$index}}
-                            </td>
-                        {{end}}
-                    </tr>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <tr class="table-dark">
+                            {{range $index := iterate $dim}}
+                                <td class="text-center text-white">
+                                    {{$index}}
+                                </td>
+                            {{end}}
+                        </tr>
 
-                    <tr>
-                        {{range $index := iterate $dim}}
-                            <td class="text-center text-white">
-                                <input type="checkbox">
-                            </td>
-                        {{end}}
-                    </tr>
-                </table>
-            </div>
+                        <tr>
+                            {{range $index := iterate $dim}}
+                                <td class="text-center text-white">
 
-        {{end}}
+                                    {{if gt (index $reservations (printf "%s-%s-%d" $currentYear $currentMonth $index)) 0}}
+                                        <a href="/admin/reservations/{{index $reservations (printf "%s-%s-%d" $currentYear $currentMonth $index)}}">
+                                            <span class="text-danger">R</span>
+                                        </a>
+                                    {{else}}
+                                        <input
+                                                {{if gt (index $blocks (printf "%s-%s-%d" $currentYear $currentMonth $index)) 0}}
+                                                    checked
+                                                    name="remove_block_{{$roomID}}_{{printf "%s-%s-%d" $currentYear $currentMonth $index}}"
+                                                    value="{{index $blocks (printf "%s-%s-%d" $currentYear $currentMonth $index)}}"
+                                                {{else}}
+                                                    name="add_block_{{$roomID}}_{{printf "%s-%s-%d" $currentYear $currentMonth $index}}"
+                                                {{end}}
+                                                type="checkbox">
+                                    {{end}}
+                                </td>
+                            {{end}}
+                        </tr>
+                    </table>
+                </div>
+
+            {{end}}
+
+            <hr>
+
+            <button type="submit" class="btn btn-primary">save changes</button>
+
+        </form>
 
 
     </div>

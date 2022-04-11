@@ -3,5 +3,5 @@ services:
   mailhog:
     image: mailhog/mailhog
     ports:
-      - "11025:1025" # smtp server
-      - "18025:8025" # web ui
+      - "1025:1025" # smtp server
+      - "8025:8025" # web ui
