@@ -650,7 +650,7 @@ func (m *Repository) AdminPostReservationsCalender(rw http.ResponseWriter, r *ht
 		if strings.HasPrefix(name, "add_block_") {
 			exploded := strings.Split(name, "_")
 			roomID, _ := strconv.Atoi(exploded[2])
-			t, _ := time.ParseInLocation("2006-01-2", exploded[3], time.UTC)
+			t, _ := time.Parse("2006-01-2", exploded[3])
 			err = m.DB.InsertBlockForRoom(roomID, t)
 			if err != nil {
 				log.Println(err)
