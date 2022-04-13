@@ -28,6 +28,13 @@ var theTests = []struct {
 	{"about", "/about", "GET", http.StatusOK},
 	{"json", "/json", "GET", http.StatusOK},
 	{"reservation", "/reservation", "GET", http.StatusOK},
+	{"non-existent", "/dark/mode", "GET", http.StatusNotFound},
+	{"login", "/login", "GET", http.StatusOK},
+	{"logout", "/logout", "GET", http.StatusOK},
+	{"dashboard", "/admin/dashboard", "GET", http.StatusOK},
+	{"admin-reservations", "/admin/reservations", "GET", http.StatusOK},
+	{"admin-new-reservations", "/admin/new-reservations", "GET", http.StatusOK},
+	{"admin-show-reservations", "/admin/reservations/1", "GET", http.StatusOK},
 }
 
 func TestHandlers(t *testing.T) {
@@ -419,6 +426,10 @@ func TestRepository_ChooseRoom(t *testing.T) {
 	}
 
 }
+
+//func TestRepository_PostLogin(t *testing.T) {
+//
+//}
 
 func getCtx(req *http.Request) context.Context {
 	ctx, err := session.Load(req.Context(), req.Header.Get("X-Session"))
