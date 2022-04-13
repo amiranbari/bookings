@@ -591,14 +591,14 @@ func (m *Repository) AdminReservationsCalender(rw http.ResponseWriter, r *http.R
 				}
 			} else {
 				//it's a block
-				for d := y.StartDate; d.After(y.EndDate) == false; d = d.AddDate(0, 0, 1) {
-					blockMap[d.Format("2006-01-2")] = y.ID
-				}
+				blockMap[y.StartDate.Format("2006-01-2")] = y.ID
 			}
 		}
 
 		data[fmt.Sprintf("reservation_map_%d", x.ID)] = reservationMap
 		data[fmt.Sprintf("block_map_%d", x.ID)] = blockMap
+
+		//fmt.Println(blockMap)
 
 		m.App.Session.Put(r.Context(), fmt.Sprintf("block_map_%d", x.ID), blockMap)
 	}
@@ -650,7 +650,7 @@ func (m *Repository) AdminPostReservationsCalender(rw http.ResponseWriter, r *ht
 		if strings.HasPrefix(name, "add_block_") {
 			exploded := strings.Split(name, "_")
 			roomID, _ := strconv.Atoi(exploded[2])
-			t, _ := time.Parse("2006-01-02", exploded[3])
+			t, _ := time.ParseInLocation("2006-01-2", exploded[3], time.UTC)
 			err = m.DB.InsertBlockForRoom(roomID, t)
 			if err != nil {
 				log.Println(err)
