@@ -104,7 +104,7 @@ func (m *PostgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]
 			from 
 				rooms r
 				where r.id not in 
-				(select rr.room_id from room_restrictions rr where $1 < end_date and $2 > start_date) 
+				(select rr.room_id from room_restrictions rr where $1 <= end_date and $2 >= start_date) 
 			`
 
 	rows, err := m.DB.QueryContext(ctx, query, start, end)
@@ -435,7 +435,7 @@ func (m *PostgresDBRepo) GetRestrictionsForRoomByDate(roomID int, start, end tim
 
 	query := `select id, room_id, coalesce (reservation_id, 0), restriction_id, start_date, end_date, created_at, updated_at 
 				from room_restrictions
-				where room_id = $1 and $2 < end_date and $3 >= start_date`
+				where room_id = $1 and $2 <= end_date and $3 >= start_date`
 
 	rows, err := m.DB.QueryContext(ctx, query, roomID, start, end)
 	if err != nil {
