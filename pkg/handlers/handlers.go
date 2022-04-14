@@ -434,7 +434,7 @@ func (m *Repository) AdminShowReservations(rw http.ResponseWriter, r *http.Reque
 	exploded := strings.Split(r.RequestURI, "/")
 	id, err := strconv.Atoi(exploded[3])
 	if err != nil {
-		helpers.ServerError(rw, err)
+		http.Redirect(rw, r, "/admin/reservations", http.StatusSeeOther)
 		return
 	}
 
@@ -463,7 +463,8 @@ func (m *Repository) AdminPostShowReservations(rw http.ResponseWriter, r *http.R
 
 	res, err := m.DB.GetReservationByID(id)
 	if err != nil {
-		helpers.ServerError(rw, err)
+		m.App.Session.Put(r.Context(), "warning", "Something wrong happened!")
+		http.Redirect(rw, r, "/admin/reservations", http.StatusSeeOther)
 		return
 	}
 

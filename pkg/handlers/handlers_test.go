@@ -34,7 +34,8 @@ var theTests = []struct {
 	{"dashboard", "/admin/dashboard", "GET", http.StatusOK},
 	{"admin-reservations", "/admin/reservations", "GET", http.StatusOK},
 	{"admin-new-reservations", "/admin/new-reservations", "GET", http.StatusOK},
-	{"admin-show-reservations", "/admin/reservations/1", "GET", http.StatusOK},
+	{"admin-show-reservation", "/admin/reservations/1", "GET", http.StatusOK},
+	{"admin-fail-reservation", "/admin/reservations/non-roomID", "GET", http.StatusOK},
 }
 
 func TestHandlers(t *testing.T) {
@@ -51,6 +52,8 @@ func TestHandlers(t *testing.T) {
 				t.Log(err)
 				t.Fatal(err)
 			}
+
+			defer resp.Body.Close()
 
 			if resp.StatusCode != e.expectedStatusCode {
 				t.Errorf("for %s, expected %d but got %d", e.name, e.expectedStatusCode, resp.StatusCode)
@@ -427,9 +430,158 @@ func TestRepository_ChooseRoom(t *testing.T) {
 
 }
 
-//func TestRepository_PostLogin(t *testing.T) {
-//
-//}
+var loginTests = []struct {
+	name               string
+	email              string
+	expectedStatusCode int
+	expectedHtml       string
+	expectedLocation   string
+}{
+	{
+		"valid-credentials",
+		"admin@gmail.com",
+		http.StatusSeeOther,
+		"",
+		"/",
+	},
+	{
+		"invalid-credentials",
+		"me@gmail.com",
+		http.StatusSeeOther,
+		"",
+		"/login",
+	},
+	{
+		"invalid-data",
+		"j",
+		http.StatusOK,
+		"",
+		"",
+	},
+}
+
+func TestLogin(t *testing.T) {
+	for _, e := range loginTests {
+		postedData := url.Values{}
+		postedData.Add("email", e.email)
+		postedData.Add("password", "12345678")
+
+		//request
+		req, _ := http.NewRequest("POST", "/login", strings.NewReader(postedData.Encode()))
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+
+		//header
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		//call the handler
+		handler := http.HandlerFunc(Repo.PostLogin)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != e.expectedStatusCode {
+			t.Errorf("Faild %s, Post Login Handler return wrong response code: got %d, wanted %d", e.name, rr.Code, e.expectedStatusCode)
+		}
+
+		if e.expectedLocation != "" {
+			actualLoc, _ := rr.Result().Location()
+			if actualLoc.String() != e.expectedLocation {
+				t.Errorf("Failed %s: expected location %s, but got %s", e.name, e.expectedLocation, actualLoc.String())
+			}
+		}
+
+		if e.expectedHtml != "" {
+			html := rr.Body.String()
+			if !strings.Contains(html, e.expectedHtml) {
+				t.Errorf("Failed %s: expected html %s, but got %s", e.name, e.expectedHtml, html)
+			}
+		}
+	}
+}
+
+var adminPostShowReservationTests = []struct {
+	url                string
+	name               string
+	postedData         url.Values
+	expectedStatusCode int
+	expectedHtml       string
+	expectedLocation   string
+}{
+	{
+		"/admin/reservations/1",
+		"valid data",
+		url.Values{
+			"first_name": {"Amir"},
+			"last_name":  {"Anbari"},
+			"email":      {"amir@anbari.com"},
+			"phone":      {"555-555-5555"},
+		},
+		http.StatusSeeOther,
+		"",
+		"/admin/reservations",
+	},
+	{
+		"/admin/reservations/2",
+		"invalid-roomID",
+		url.Values{
+			"first_name": {"Amir"},
+			"last_name":  {"Anbari"},
+			"email":      {"amir@anbari.com"},
+			"phone":      {"555-555-5555"},
+		},
+		http.StatusSeeOther,
+		"",
+		"/admin/reservations",
+	},
+	//{
+	//	"invalid-data",
+	//	url.Values{
+	//		"first_name": {"Amir"},
+	//		"last_name":  {"Anbari"},
+	//		"email":      {"amir@anbari.com"},
+	//		"phone":      {"555-555-5555"},
+	//	},
+	//	http.StatusSeeOther,
+	//	"",
+	//	"",
+	//},
+}
+
+func TestRepository_AdminPostShowReservations(t *testing.T) {
+	for _, e := range adminPostShowReservationTests {
+		//request
+		req, _ := http.NewRequest("POST", e.url, strings.NewReader(e.postedData.Encode()))
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+		req.RequestURI = e.url
+
+		//header
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		//call the handler
+		handler := http.HandlerFunc(Repo.AdminPostShowReservations)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != e.expectedStatusCode {
+			t.Errorf("Faild %s, Post Login Handler return wrong response code: got %d, wanted %d", e.name, rr.Code, e.expectedStatusCode)
+		}
+
+		if e.expectedLocation != "" {
+			actualLoc, _ := rr.Result().Location()
+			if actualLoc.String() != e.expectedLocation {
+				t.Errorf("Failed %s: expected location %s, but got %s", e.name, e.expectedLocation, actualLoc.String())
+			}
+		}
+
+		if e.expectedHtml != "" {
+			html := rr.Body.String()
+			if !strings.Contains(html, e.expectedHtml) {
+				t.Errorf("Failed %s: expected html %s, but got %s", e.name, e.expectedHtml, html)
+			}
+		}
+	}
+}
 
 func getCtx(req *http.Request) context.Context {
 	ctx, err := session.Load(req.Context(), req.Header.Get("X-Session"))

@@ -55,8 +55,10 @@ func (m *testDBRepo) GetUserByID(id int) (models.User, error) {
 }
 
 func (m *testDBRepo) Authenticate(email, password string) (int, string, error) {
-	return 1, "", nil
-
+	if email == "admin@gmail.com" {
+		return 1, "", nil
+	}
+	return 0, "", errors.New("some error!")
 }
 
 func (m *testDBRepo) AllReservations() ([]models.Reservation, error) {
@@ -71,6 +73,9 @@ func (m *testDBRepo) AllNewReservations() ([]models.Reservation, error) {
 
 func (m *testDBRepo) GetReservationByID(id int) (models.Reservation, error) {
 	var reservation models.Reservation
+	if id == 2 {
+		return reservation, errors.New("some error!")
+	}
 	return reservation, nil
 }
 
