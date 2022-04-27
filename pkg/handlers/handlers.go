@@ -256,7 +256,7 @@ func (m *Repository) PostReservation(rw http.ResponseWriter, r *http.Request) {
 
 	if !form.Valid() {
 		m.App.Session.Put(r.Context(), "error", "Form is not valid!")
-		http.Redirect(rw, r, "/make-reservation", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, "/make-reservation", http.StatusSeeOther)
 		return
 	}
 
