@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"github.com/amiranbari/bookings/internal/driver"
 	"github.com/amiranbari/bookings/internal/helpers"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -93,7 +95,13 @@ func run() (*driver.DB, error) {
 	gob.Register(models.RoomRestriction{})
 	gob.Register(map[string]int{})
 
-	inProduction := flag.Bool("production", false, "Application is in production or not!")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file", err)
+	}
+
+	inProduction, _ := strconv.ParseBool(os.Getenv("PRODUCTION"))
+
 	useCache := flag.Bool("cache", false, "User cache for templates or not!")
 	flag.Parse()
 
@@ -101,7 +109,7 @@ func run() (*driver.DB, error) {
 	app.MailChan = mailChan
 
 	// change this to true in production
-	app.InProduction = *inProduction
+	app.InProduction = inProduction
 
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.InfoLog = infoLog
