@@ -372,7 +372,6 @@ func (m *Repository) PostLogin(rw http.ResponseWriter, r *http.Request) {
 
 	id, _, err := m.DB.Authenticate(email, password)
 	if err != nil {
-		log.Println(err)
 		m.App.Session.Put(r.Context(), "error", "invalid login credentials")
 		http.Redirect(rw, r, "/login", http.StatusSeeOther)
 		return
@@ -489,13 +488,13 @@ func (m *Repository) AdminPutShowReservations(rw http.ResponseWriter, r *http.Re
 	exploded := strings.Split(r.RequestURI, "/")
 	id, err := strconv.Atoi(exploded[3])
 	if err != nil {
-		helpers.ServerError(rw, err)
+		http.Redirect(rw, r, "/admin/reservations", http.StatusTemporaryRedirect)
 		return
 	}
 
 	err = m.DB.UpdateProcessedForReservation(id, 1)
 	if err != nil {
-		helpers.ServerError(rw, err)
+		http.Redirect(rw, r, "/admin/reservations", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -508,13 +507,13 @@ func (m *Repository) AdminDeleteReservation(rw http.ResponseWriter, r *http.Requ
 	exploded := strings.Split(r.RequestURI, "/")
 	id, err := strconv.Atoi(exploded[3])
 	if err != nil {
-		helpers.ServerError(rw, err)
+		http.Redirect(rw, r, "/admin/reservations", http.StatusTemporaryRedirect)
 		return
 	}
 
 	err = m.DB.DeleteReservation(id)
 	if err != nil {
-		helpers.ServerError(rw, err)
+		http.Redirect(rw, r, "/admin/reservations", http.StatusTemporaryRedirect)
 		return
 	}
 

@@ -84,10 +84,16 @@ func (m *testDBRepo) UpdateReservation(r models.Reservation) error {
 }
 
 func (m *testDBRepo) DeleteReservation(id int) error {
+	if id == 2 {
+		return errors.New("Reservation not found!")
+	}
 	return nil
 }
 
 func (m *testDBRepo) UpdateProcessedForReservation(id, processed int) error {
+	if id == 2 {
+		return errors.New("Reservation not found!")
+	}
 	return nil
 }
 
